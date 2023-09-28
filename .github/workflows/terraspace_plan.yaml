@@ -1,0 +1,11 @@
+name: Plan Terraspace project
+on:
+    workflow_dispatch:
+jobs:
+    plan-all:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: hashicorp/setup-terraform@v2
+          with:
+              terraform_version: 1.5.5
+              cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}

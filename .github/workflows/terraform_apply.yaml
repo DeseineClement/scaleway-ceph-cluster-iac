@@ -2,15 +2,19 @@ name: Apply Terraform project
 on:
     workflow_dispatch:
 
-env:
-  TF_CLOUD_ORGANIZATION: "Korbo"
-  TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
-  TF_WORKSPACE: "ceph_cluster"
-  CONFIG_DIRECTORY: "./"
-
 jobs:
     apply:
         runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            terraform_workspace:
+              - ceph_cluster_1
+              - ceph_cluster_2
+        env:
+          TF_CLOUD_ORGANIZATION: "Korbo"
+          TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
+          TF_WORKSPACE: "${{ matrix.terraform_workspace }}"
+          CONFIG_DIRECTORY: "./"
         steps:
         - name: Checkout VCS
           uses: actions/checkout@v3

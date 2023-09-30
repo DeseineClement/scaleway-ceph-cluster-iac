@@ -1,6 +1,9 @@
 name: Apply Terraform project
 on:
     workflow_dispatch:
+    push:
+      branches:
+      - main
 
 jobs:
     apply:

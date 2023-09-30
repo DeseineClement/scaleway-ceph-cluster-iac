@@ -2,8 +2,15 @@ name: Destroy Terraform project
 on:
     workflow_dispatch:
 jobs:
-    destoy:
+    destroy:
         runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            terraform_workspace:
+            - cluster_1
+            - cluster_2
+        env:
+          TF_WORKSPACE: "${{ matrix.terraform_workspace }}"
         steps:
         - name: Checkout VCS
           uses: actions/checkout@v3

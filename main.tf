@@ -49,12 +49,12 @@ module "mds_node" {
   image_name     = var.mds_node_image_name
 }
 
-###### ISCM NODE ############################################################
-module "iscm_node" {
+###### ISCI NODE ############################################################
+module "isci_node" {
   source = "./modules/scaleway_instances"
 
-  instance_count = var.iscm_node_count
+  instance_count = var.isci_node_count
   instance_type  = var.instance_type
-  instance_name  = "${var.instance_name_prefix}_iscm_node"
-  image_name     = var.iscm_node_image_name
+  instance_name  = "${var.instance_name_prefix}_isci_node"
+  image_name     = var.isci_node_image_name
 }

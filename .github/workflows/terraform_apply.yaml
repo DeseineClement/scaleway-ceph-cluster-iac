@@ -22,8 +22,6 @@ jobs:
     tflint:
       runs-on: ubuntu-latest
       needs: [validate]
-      env:
-        TF_WORKSPACE: cluster_1
       steps:
       - name: Checkout VCS
         uses: actions/checkout@v3

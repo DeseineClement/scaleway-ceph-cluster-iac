@@ -4,7 +4,9 @@ on:
     push:
       branches:
       - main
-
+env:
+  TERRAFORM_DIRECTORY: "./terraform"
+  
 jobs:
     validate:
       runs-on: ubuntu-latest
@@ -15,6 +17,7 @@ jobs:
         - name: Terraform validate
           uses: dflook/terraform-validate@v1
           with:
+            path: ${{ env.TERRAFORM_DIRECTORY }}
             workspace: ceph_cluster_1
           env:
             TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
@@ -22,6 +25,9 @@ jobs:
     tflint:
       runs-on: ubuntu-latest
       needs: [validate]
+      defaults:
+        run:
+          working-directory: ${{ env.TERRAFORM_DIRECTORY }}
       steps:
       - name: Checkout VCS
         uses: actions/checkout@v3
@@ -37,7 +43,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Run TFLint
-        run: tflint -f compact
+        run: tflint --recursive -f compact
 
     apply:
         runs-on: ubuntu-latest
@@ -51,7 +57,6 @@ jobs:
           TF_CLOUD_ORGANIZATION: "Korbo"
           TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
           TF_WORKSPACE: "${{ matrix.terraform_workspace }}"
-          CONFIG_DIRECTORY: "./"
         steps:
         - name: Checkout VCS
           uses: actions/checkout@v3
@@ -61,7 +66,7 @@ jobs:
           id: apply-upload
           with:
             workspace: ${{ env.TF_WORKSPACE }}
-            directory: ${{ env.CONFIG_DIRECTORY }}
+            directory: ${{ env.TERRAFORM_DIRECTORY }}
 
         - name: Create Apply Run
           uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0

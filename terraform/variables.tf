@@ -68,14 +68,14 @@ variable "mds_node_image_name" {
   description = "The name of the image to use for MDS node(s)."
 }
 
-###### ISCI NODE ############################################################
-variable "isci_node_count" {
+###### RGW ISCSI NODE #######################################################
+variable "rgw_iscsi_node_count" {
   type        = number
-  description = "The amount of ISCI node(s) to have"
+  description = "The amount of RGW ISCSI node(s) to have"
   default     = 0
 }
 
-variable "isci_node_image_name" {
+variable "rgw_iscsi_node_image_name" {
   type        = string
-  description = "The name of the image to use for ISCI node(s)."
+  description = "The name of the image to use for RGW ISCSI node(s)."
 }

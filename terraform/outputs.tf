@@ -53,13 +53,13 @@ output "mds_node_private_ips" {
   value       = module.mds_node.instance_private_ips
 }
 
-###### ISCI NODE ############################################################
-output "isci_node_public_ips" {
-  description = "The public Ip addresses allocated to each ISCI node"
-  value       = module.isci_node.instance_public_ips
+###### RGW ISCSI NODE #######################################################
+output "rgw_iscsi_node_public_ips" {
+  description = "The public Ip addresses allocated to each RGW ISCSI node"
+  value       = module.rgw_iscsi_node.instance_public_ips
 }
 
-output "isci_node_private_ips" {
-  description = "The private Ip addresses allocated to each ISCI node"
-  value       = module.isci_node.instance_private_ips
+output "rgw_iscsi_node_private_ips" {
+  description = "The private Ip addresses allocated to each RGW ISCSI node"
+  value       = module.rgw_iscsi_node.instance_private_ips
 }

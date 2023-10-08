@@ -58,3 +58,15 @@ module "rgw_iscsi_node" {
   instance_name  = "${var.instance_name_prefix}_rgw_iscsi_node"
   image_name     = var.rgw_iscsi_node_image_name
 }
+
+###### ANSIBLE ##############################################################
+module "ansible_inventory" {
+  source = "./modules/ansible_inventory"
+  inventory = {
+    utility = module.utility_node.instance_public_ips
+    client  = module.client_node.instance_public_ips
+    mon     = module.mon_node.instance_public_ips
+    mds     = module.mds_node.instance_public_ips
+    iscsi   = module.rgw_iscsi_node.instance_public_ips
+  }
+}

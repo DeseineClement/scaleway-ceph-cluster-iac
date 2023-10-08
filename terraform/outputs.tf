@@ -63,3 +63,7 @@ output "rgw_iscsi_node_private_ips" {
   description = "The private Ip addresses allocated to each RGW ISCSI node"
   value       = module.rgw_iscsi_node.instance_private_ips
 }
+
+output "inventory_filename" {
+  value = module.ansible_inventory.inventory_filename
+}

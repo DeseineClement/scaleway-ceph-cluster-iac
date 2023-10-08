@@ -1,0 +1,26 @@
+---
+# tasks file for roles/sudoers
+- name: SUDOERS - Ensure users groups are present
+  group:
+    name: "{{ item.group }}"
+    state: present
+  with_items: "{{ sudoers_role_users }}"
+
+- name: SUDOERS - Ensure users are present
+  user:
+    name: "{{ item.user }}"
+    state: present
+    groups: "{{ item.group }}"
+  with_items: "{{ sudoers_role_users }}"
+
+- name: SUDOERS - configure authorized key
+  authorized_key:
+    user: "{{ item.user }}"
+    state: present
+    key: "{{ lookup('file', item.authorized_key) }}"
+  with_items: "{{ sudoers_role_users }}"
+
+- name: SUDOERS - Configure sudo accesses
+  template:
+    src: sudoers.j2
+    dest: /etc/sudoers.d/00-cloud-init-sudoers

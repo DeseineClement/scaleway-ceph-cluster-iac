@@ -1,0 +1,6 @@
+---
+# defaults file for roles/sudoers
+sudoers_role_users:
+  - user: my_user
+    group: my_group
+    sudo_accesses: no

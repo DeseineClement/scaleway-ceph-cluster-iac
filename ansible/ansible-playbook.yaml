@@ -1,0 +1,8 @@
+---
+- name: Install remote user
+  hosts: all
+  remote_user: root
+  vars_files:
+    - vars/ansible-playbook-vars.yaml
+  roles:
+    - sudoers

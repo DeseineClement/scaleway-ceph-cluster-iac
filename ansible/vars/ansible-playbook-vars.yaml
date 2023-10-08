@@ -1,0 +1,6 @@
+---
+sudoers_role_users:
+  - user: cephuser
+    group: cephgroup
+    sudo_accesses: yes
+    authorized_key: id_ed25519_scaleway.pub

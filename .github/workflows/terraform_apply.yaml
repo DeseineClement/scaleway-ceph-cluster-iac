@@ -1,36 +1,32 @@
+---
 name: Apply Terraform project
 on:
-    workflow_dispatch:
-    push:
-      branches:
-      - main
-env:
-  TERRAFORM_DIRECTORY: "./terraform"
-  
+  workflow_dispatch:
+
 jobs:
-    validate:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout VCS
-          uses: actions/checkout@v3
-
-        - name: Terraform validate
-          uses: dflook/terraform-validate@v1
-          with:
-            path: ${{ env.TERRAFORM_DIRECTORY }}
-            workspace: ceph_cluster_1
-          env:
-            TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
-
-    tflint:
-      runs-on: ubuntu-latest
-      needs: [validate]
-      defaults:
-        run:
-          working-directory: ${{ env.TERRAFORM_DIRECTORY }}
-      steps:
+  terraform_validate:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout VCS
         uses: actions/checkout@v3
+
+      - name: Terraform validate
+        uses: dflook/terraform-validate@v1
+        with:
+          path: ./terraform
+          workspace: ceph_cluster_1
+        env:
+          TERRAFORM_CLOUD_TOKENS: app.terraform.io=${{ secrets.TF_API_TOKEN }}
+
+  terraform_tflint:
+    runs-on: ubuntu-latest
+    needs: [terraform_validate]
+    defaults:
+      run:
+        working-directory: ./terraform
+    steps:
+      - name: Checkout VCS
+        uses: actions/checkout@v4
 
       - uses: terraform-linters/setup-tflint@v3
         name: Setup TFLint
@@ -45,40 +41,99 @@ jobs:
       - name: Run TFLint
         run: tflint --recursive -f compact
 
-    apply:
-        runs-on: ubuntu-latest
-        needs: [tflint]
-        strategy:
-          matrix:
-            terraform_workspace:
-              - ceph_cluster_1
-              - ceph_cluster_2
-        env:
-          TF_CLOUD_ORGANIZATION: "Korbo"
-          TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
-          TF_WORKSPACE: "${{ matrix.terraform_workspace }}"
-        steps:
-        - name: Checkout VCS
-          uses: actions/checkout@v3
+  terraform_apply:
+    runs-on: ubuntu-latest
+    needs: [terraform_tflint]
+    strategy:
+      matrix:
+        terraform_workspace:
+          - ceph_cluster_1
+          - ceph_cluster_2
+    env:
+      TF_CLOUD_ORGANIZATION: "Korbo"
+      TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
+      TF_WORKSPACE: "${{ matrix.terraform_workspace }}"
+    steps:
+      - name: Checkout VCS
+        uses: actions/checkout@v4
 
-        - name: Upload Configuration
-          uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
-          id: apply-upload
-          with:
-            workspace: ${{ env.TF_WORKSPACE }}
-            directory: ${{ env.TERRAFORM_DIRECTORY }}
+      - name: Upload Configuration
+        uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+        id: apply-upload
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          directory: ./terraform
 
-        - name: Create Apply Run
-          uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
-          id: apply-run
-          with:
-            workspace: ${{ env.TF_WORKSPACE }}
-            configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
+      - name: Create Apply Run
+        uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
+        id: apply-run
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          configuration_version: ${{ steps.apply-upload.outputs.configuration_version_id }}
 
-        - name: Apply
-          uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0
-          if: fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable
-          id: apply
-          with:
-            run: ${{ steps.apply-run.outputs.run_id }}
-            comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
+      - name: Apply
+        uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.0.0
+        if: fromJSON(steps.apply-run.outputs.payload).data.attributes.actions.IsConfirmable
+        id: apply
+        with:
+          run: ${{ steps.apply-run.outputs.run_id }}
+          comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
+
+  ansible_provision_cluster_2:
+    runs-on: ubuntu-latest
+    needs: [terraform_apply]
+    env:
+      TF_CLOUD_ORGANIZATION: Korbo
+      TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}"
+      TF_WORKSPACE: cluster_2
+    defaults:
+      run:
+        working-directory: ./terraform
+    steps:
+      - name: Checkout VCS
+        uses: actions/checkout@v4
+
+      - name: Checkout adammck/terraform-inventory
+        uses: actions/checkout@v4
+        with:
+          repository: adammck/terraform-inventory
+          path: terraform-inventory
+
+      - name: Install and configure Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Install GoLang
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.16'
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Build terraform-inventory dependencies
+        run: |
+          cd ${GITHUB_WORKSPACE}/terraform-inventory
+          go build
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Terraform Init
+        run: terraform -chdir=${GITHUB_WORKSPACE}/terraform init
+
+      - name: Configure Ansible private key
+        run: |
+          echo ${{ secrets.TF_API_TOKEN }} > ${GITHUB_WORKSPACE}/ansible/private_key.pem
+          chmod 400 ${GITHUB_WORKSPACE}/ansible/private_key.pem
+
+      - name: Execute Ansible playbook
+        run: |
+          ansible-playbook                                                  \
+            ${GITHUB_WORKSPACE}/ansible/ansible-playbook.yaml               \
+            -i ${GITHUB_WORKSPACE}/terraform-inventory/terraform-inventory  \
+            --private-key ${GITHUB_WORKSPACE}/ansible/private_key.pem

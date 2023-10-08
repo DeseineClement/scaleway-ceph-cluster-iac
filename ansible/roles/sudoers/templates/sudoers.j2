@@ -1,0 +1,5 @@
+{%- for user in sudoers_role_users %}
+{%- if user.sudo_accesses %}
+{{ user.user }} ALL=(ALL) NOPASSWD:ALL
+{%- endif %}
+{%- endfor %}

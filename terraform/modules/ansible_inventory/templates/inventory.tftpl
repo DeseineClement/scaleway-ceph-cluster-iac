@@ -1,6 +1,0 @@
-%{ for group, hosts in inventory ~}
-[${group}]
-%{ for host_name, host_ip in hosts ~}
-${host_name}    ansible_connection=ssh  ansible_user=root   ansible_host=${host_ip} ansible_port=22
-%{ endfor ~}
-%{ endfor ~}

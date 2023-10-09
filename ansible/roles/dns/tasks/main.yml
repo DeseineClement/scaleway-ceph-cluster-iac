@@ -1,0 +1,31 @@
+---
+# tasks file for roles/dns
+- name: DNS - ensure bind and bind-utils are installed
+  yum:
+    name:
+      - bind
+      - bind-utils
+    state: latest
+  notify:
+    - DNS - restart named
+
+- name: DNS - enable named
+  systemd:
+    name: named
+    enabled: yes
+
+- name: DNS - generate named configuration file
+  template:
+    src: named.conf.j2
+    dest: '{{ dns_role_named_configuration_path }}'
+    mode: '0640'
+  notify:
+    - DNS - restart named
+
+- name: DNS - generate named database file
+  template:
+    src: dns.db.j2
+    dest: '{{ dns_role_named_database_configuration }}'
+    mode: '0640'
+  notify:
+    - DNS - restart named

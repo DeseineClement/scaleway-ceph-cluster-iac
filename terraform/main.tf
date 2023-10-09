@@ -1,3 +1,7 @@
+locals {
+  dns_role_named_dns_prefix = "ceph"
+}
+
 ###### UTILITY NODE #########################################################
 module "utility_node" {
   source = "./modules/scaleway_instances"

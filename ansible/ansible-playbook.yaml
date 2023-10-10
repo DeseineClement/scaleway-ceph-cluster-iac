@@ -6,10 +6,22 @@
   roles:
     - sudoers
 
-- name: Install and configure Utility Nodes
+- name: Install and configure DNS Server
   hosts: module_utility_node_servers
   vars_files:
     - vars/ansible-playbook-vars.yaml
   roles:
     - dns
+
+- name: Install and configure NTP and Network manager
+  hosts:
+    - module_utility_node_servers
+    - module_mds_node_servers
+    - module_mon_node_servers
+    - module_osd_node_servers
+    - module_rgw_iscsi_node_servers
+  vars_files:
+    - vars/ansible-playbook-vars.yaml
+  roles:
+    - network_manager
     - ntp

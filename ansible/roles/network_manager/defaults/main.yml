@@ -1,0 +1,5 @@
+---
+# defaults file for roles/network_manager
+network_manager_role_dns_nameservers: []
+network_manager_role_named_dns_name: 'example.com'
+network_manager_role_named_dns_prefix: 'prefix'

@@ -1,8 +1,9 @@
 ---
 # defaults file for roles/dns
-dns_role_named_configuration_path: '/etc/named.conf'
-
-dns_role_named_dns_name: 'example.com'
-dns_role_named_dns_prefix: 'prefix'
+dns_role_named_user: named
+dns_role_named_group: named
+dns_role_named_configuration_path: /etc/named.conf
+dns_role_named_dns_name: example.com
+dns_role_named_dns_prefix: prefix
 dns_role_named_dns_entries: {}
 dns_role_named_database_configuration: '/var/named/{{ dns_role_named_dns_name }}.db'

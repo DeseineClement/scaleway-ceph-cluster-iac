@@ -27,5 +27,7 @@
     src: dns.db.j2
     dest: '{{ dns_role_named_database_configuration }}'
     mode: '0640'
+    owner: '{{ dns_role_named_user }}'
+    group: '{{ dns_role_named_group }}'
   notify:
     - DNS - restart named

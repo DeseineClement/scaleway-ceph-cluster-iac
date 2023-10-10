@@ -1,0 +1,6 @@
+---
+# handlers file for roles/network_manager
+- name: NETWORK MANAGER - reload network_manager
+  systemd:
+    name: NetworkManager
+    state: reloaded

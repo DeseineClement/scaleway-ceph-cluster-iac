@@ -1,0 +1,14 @@
+---
+# tasks file for roles/network_manager
+- name: NETWORK MANAGER - disable auto generation of DNS resolution
+  copy:
+    src: dns-none.conf
+    dest: /etc/NetworkManager/conf.d/90-dns-none.conf
+    mode: '0644'
+  notify: NETWORK MANAGER - reload network_manager
+
+- name: NETWORK MANAGER - add resolv.conf
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    mode: '0644'

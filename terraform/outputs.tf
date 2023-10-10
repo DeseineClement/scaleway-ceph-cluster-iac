@@ -13,3 +13,11 @@ output "dns_role_named_dns_entries" {
     { for index, ip in values(module.rgw_iscsi_node.instance_public_ips) : "rgwisci${index + 1}.${local.dns_role_named_dns_prefix}" => ip },
   )
 }
+
+output "network_manager_role_named_dns_prefix" {
+  value = local.dns_role_named_dns_prefix
+}
+
+output "network_manager_role_dns_nameservers" {
+  value = values(module.utility_node.instance_public_ips)
+}

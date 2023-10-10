@@ -1,0 +1,4 @@
+search {{ network_manager_role_named_dns_prefix }}.{{ network_manager_role_named_dns_name }}
+{% for nameserver in network_manager_role_dns_nameservers %}
+nameserver  {{ nameserver }}
+{% endfor %}

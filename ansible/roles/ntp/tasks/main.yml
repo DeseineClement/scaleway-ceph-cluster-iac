@@ -1,2 +1,30 @@
 ---
 # tasks file for roles/ntp
+- name: NTP - ensure chrony is installed
+  yum:
+    name: chrony
+    state: latest
+
+- name: NTP - add chrony configuration file
+  template:
+    src: chrony.conf.j2
+    dest: /etc/chrony.conf
+    mode: '0644'
+  notify: NTP - restart chronyd
+
+- name: DNS - enable chrony
+  systemd:
+    name: chronyd
+    enabled: yes
+  notify: NTP - restart chronyd
+
+- name: NTP - restart chronyd
+  systemd:
+    name: chronyd
+    state: restarted
+
+- debug:
+    var: inventory_hostname
+
+- debug:
+    var: groups[ntp_role_chrony_host_role]

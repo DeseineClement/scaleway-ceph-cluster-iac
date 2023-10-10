@@ -4,3 +4,6 @@ sudoers_role_users:
     group: cephgroup
     sudo_accesses: yes
     authorized_key: id_ed25519_scaleway.pub
+
+ntp_role_chrony_host_role: module_utility_node_servers
+ntp_role_chrony_pool: ntp.ceph.example.com

@@ -8,6 +8,7 @@ $TTL 8h
 
 @   IN NS   dns.{{ dns_role_named_dns_prefix }}.{{ dns_role_named_dns_name }}.
 dns.{{ dns_role_named_dns_prefix }}   IN A    {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+ntp.{{ dns_role_named_dns_prefix }}   IN A    {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
 {% for entry, ip in dns_role_named_dns_entries.items() %}
 {{ entry }}  IN A    {{ ip }}
 {% endfor %}

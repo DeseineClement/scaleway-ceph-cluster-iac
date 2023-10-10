@@ -1,2 +1,6 @@
 ---
 # handlers file for roles/ntp
+- name: NTP - restart chronyd
+  systemd:
+    name: chronyd
+    state: restarted

@@ -22,11 +22,11 @@ output "network_manager_role_dns_nameservers" {
   value = values(module.utility_node.instance_public_ips)
 }
 
-output "ntp_role_chrony_authorized_subnets" {
+output "ntp_role_chrony_allow" {
   value = concat(
-    values(module.osd_node.instance_ips_prefix),
-    values(module.mon_node.instance_ips_prefix),
-    values(module.mds_node.instance_ips_prefix),
-    values(module.rgw_iscsi_node.instance_ips_prefix)
+    values(module.osd_node.instance_public_ips),
+    values(module.mon_node.instance_public_ips),
+    values(module.mds_node.instance_public_ips),
+    values(module.rgw_iscsi_node.instance_public_ips)
   )
 }

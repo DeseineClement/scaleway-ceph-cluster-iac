@@ -27,7 +27,7 @@ rtcsync
 
 # Allow NTP client access from local network.
 {% if  inventory_hostname in groups[ntp_role_chrony_host_role] %}
-{% for subnet in ntp_role_chrony_authorized_subnets %}
+{% for subnet in ntp_role_chrony_allow %}
 allow {{ subnet }}
 {% endfor %}
 {% endif %}

@@ -2,4 +2,4 @@
 # defaults file for roles/ntp
 ntp_role_chrony_pool: 127.0.0.1
 ntp_role_chrony_host_role: chrony
-ntp_role_chrony_authorized_subnets: []
+ntp_role_chrony_authorized_allow: []
